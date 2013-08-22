@@ -1,0 +1,51 @@
+14DEC97 -- version 1.5
+
+- 6x86_reg now also displays two bogoMIPS readings: the kernel-calculated
+  bogomips from/proc/cpuinfo, and an independently-calculated bogomips reading.
+
+- Note that bogoMIPS are *NOT* a benchmark or a test for CPU performance; they
+  are just a very good indicator of whether the BIOS has correctly configured
+  the 6x86 registers and the L2 cache/chipset timing parameters.
+
+
+03DEC97 -- version 1.4
+
+- 6x86_reg replacement for 6x86_arr (now dumps relevant 6x86 registers
+  in human-readable format).
+- DOS support was dropped.
+- A short, simple kernel patch is included.
+- With Mike Jagdis' permission, a new documentation file Doc-6x86.txt was
+  included with this release of set6x86. It does not replace the relevant
+  Cyrix and IBM Application Notes and Data Books, which one should read
+  anyway to get a better understanding of the 6x86 family of CPUs.
+- New maintainer: Andrew D. Balsa <andrewbalsa@usa.net>.
+
+
+14SEP97 -- version 1.3
+
+- 6x86_arr added (dumps Address Region Registers in human-readable format)
+
+
+29OCT96 -- version 1.2
+
+- "-c" and "-s" options for bit-setting and bit-masking.
+- silent mode changed so that get6x86reg outputs HEX-only
+  (otherwise it's pretty useless).
+- silent mode renamed to "-p" (pipeable output)
+  for compatibility with "setVGAreg".
+- fatal command line parameter errors now exit instead of
+  dumping core...
+- DOS version now uses the DOS cross-compiler from DJGPP.
+
+
+10OCT96 -- version 1.1
+
+- some documentation updates.
+- DOS version added (DJGPP compiled) + docs
+- silent mode (no output).
+
+
+05AUG96 -- version 1.0
+
+- initial release. Hacked up from "setVGAreg", which 
+  is part of SVGATextMode.

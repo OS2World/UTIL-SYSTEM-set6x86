@@ -1,0 +1,381 @@
+
+         set6x86 / get6x86 / 6x86_reg
+         ----------------------------
+
+This document has been slightly modified from its original form to
+accomodate the OS/2 specific implementation of the program.
+
+
+Please read through this file before attempting to use this program.
+It might save you a few crashes.
+
+
+Description
+-----------
+
+Set6x86 and get6x86 are two programs that allow you to poke and peek into
+the Cyrix/IBM/SGS-Thomson 6x86 CPU's configuration registers. 6x86_reg will
+display register contents in human-readable format. The short source
+test_bug is a demo program for the 6x86 "coma" bug.
+
+
+Cyrix CPUs
+----------
+
+Cyrix 6x86 CPU's are Intel Pentium-like performance CPUs, but at a lower
+cost than their Intel parts. Cyrix has adopted a CPU rating that refers to
+"equivalent Pentium performance in Windows applications" for their CPUs.
+
+A Cyrix-6x86 P133+ for example is clocked at only 110 MHz, although it
+performs as good as a Pentium 133 (hence the "P133+" rating). The "+" is a
+marketing gadget: it is supposed to point out that it's even a little better
+than a P133 on the Winstone benchmark.
+
+6x86 CPUs come at a significantly lower price than their equivalent Intel
+cousins. The only downsides are:
+
+   - a lack of support from several motherboard vendors and software vendors
+     (most CPU identification programs, Linux 2.0's /proc/cpuinfo included,
+     report a 486 CPU instead of a Cyrix 6x86). A short kernel patch
+     is available from http://www.tux.org/~balsa/linux/cyrix that
+     solves this kernel shortcoming.
+
+   - Floating point performance is not as good as a Pentium. Depending
+     on the benchmark, 15 to 50% lower FPU performance can be expected.
+
+   - This baby needs HUGE amounts of power. People used to make fun of
+     the newest Digital chip, the Alpha, a few years ago, because it
+     needed over 20 Watts of power. Well, this one too. Depending on
+     the clock speed, up to 24 Watts of power is dissipated from the
+     package!
+
+     Anyone familiar with hardware design can tell you that keeping
+     that under control is not a simple task. That is also the main
+     reason why so many people flush newsgroups with messages that the
+     6x86 CPU's are bad, don't run Win95, crash all the time,...
+
+     Do you really think those companies would even _risk_ making a CPU
+     that is not as compatible as possible? The only thing they didn't
+     replicate was the ominous Pentium FPU bug ;-)
+
+          On the other hand Cyrix 6x86 CPUs suffer from another bug, called
+          the 6x86 "coma" bug. The short program test_bug included in this
+          package is an example of how this bug affects 6x86 CPUs.  If you
+          want to see the coma bug in action, simply compile and run it.
+
+     The _real_ reason for crashes and system hangs in most cases is
+     either a temperature problem, or a digital timing problem (the
+     latter being caused by the former in many cases). Poorly cooled
+     CPU's tend to go beyond their specified ratings. Most CPUs are
+     only guaranteed to work up to 70 degrees Celsius, and with 24
+     Watts to sweat out from such a small surface, that's _very_ easily
+     exceeded.
+
+
+Why this program?
+-----------------
+
+For fun, mostly.
+
+But also for some pretty darn good reasons. Most motherboards (mine, a
+Chaintech board based on the Intel Triton II chipset) support 6x86 CPUs, but
+not as well-tested and well-set-up as Pentium CPUs.
+
+The 6x86 has a set of configuration registers that allows one to do a lot of
+things, like specifying non-cacheable memory areas (important for e.g.
+graphics cards), I/O delays, cache write policy (WB/WT), and also to enable
+an automatic standby mode where a CPU "halt" instruction cuts down power by
+a factor of 70 (from 5.8 Amps to 83 milli-Amps for the P133+).
+
+Since most computers do nothing most of the time, this would be useful to
+enable.
+
+Linux uses the halt instruction when it has nothing better to do, so
+enabling this feature will _not_ hurt performance: the CPU controls the
+powering-down of specific internal parts by hardware-control, so there's no
+software intervention needed for explicitly re-enabling a powered-down part.
+
+However, some Linux users have reported that their systems would hang if
+this feature was enabled and some bus-mastering Ethernet cards were used, in
+some specific circumstances and only with some motherboards/chipset/BIOS
+combinations! So even this seemingly inocuous feature should be tested on
+individual systems.
+
+
+Benefits?
+---------
+
+Apart from the obvious environmental reasons, there's also the temperature
+problem that is reduced substantially.
+
+If you're on a P133+ and programming like hell, or reading mail, or most of
+the other things you do in Linux (or any other OS for that matter), the CPU
+is doing nothing 99% of the time (just take an occasional look at the system
+load meter).
+
+When not set for automatic power-down, the CPU will _always_ draw its full
+24 Watts of power. With this feature enabled, power consumption drops to
+near-zero most of the time.
+
+While I'm typing this junk, my CPU is (again) 99% idle, so now the CPU uses
+only 0.3 Watts instead. That's one _hundreth_ of its full juice.
+
+No need to say that most thermal problems are history.
+
+In fact, I've been having _lots_ of spurious core dumps and "signal 11"
+messages from GCC on my system, and I always suspected temperature problems.
+With auto-suspend mode on, I haven't had a single core dump since (but I
+haven't done a lot of testing either).
+
+This convinced me that I'll have to provide better cooling for the CPU.
+
+
+DANGER!!!
+---------
+
+Of course, you're fiddling with the guts of your CPU, while it's running. So
+don't blame me if you accidently set the wrong register and your machine
+hangs.
+
+In other words, let's use the Paul Gortmaker (?) disclaimer:
+
+   "If it breaks, you get to keep the pieces"
+
+
+LITERATURE
+----------
+
+This program is completely useless without the proper docs from Cyrix. I
+explicitly didn't include any description of the 6x86 config registers
+because I didn't want to risk distributing faulty information.
+
+Cyrix's WWW site (www.cyrix.com) and their FTP site (ftp.cyrix.com) contain
+all the stuff you need. For ftp, all the files are in the "6x86" directory.
+
+You need _at least_
+
+   6X-ABDB.PDF   (361748 bytes)
+
+which is the abbreviated data book, and contains a description of all the
+registers you can tamper with (staring at page 18).
+
+The full data book is
+
+   6X-DBOOK.PDF  (2039298 bytes)
+
+For the 5x86, the Cyrix FTP/WWW site may contain equivalent doumentation
+(not checked).
+
+Here's a list of WWW sites known to carry information on 6x86 CPUs:
+
+  http://www.cyrix.com
+  http://www.chips.ibm.com/products/x86/
+  http://www.tux.org/~balsa/linux/cyrix/index.html
+  http://www.alternativecpu.com
+
+
+EXAMPLE
+-------
+
+The power-saving option described above is controlled by register 0xC2, bit
+3 of the configuration registers.  The register is specified with the "-r"
+option.  Thus,
+
+   get6x86 -r 0xC2
+
+Will display (on my system -- "your mileage my vary"):
+
+   Cyrix 6x86 config register, index 194 (=0xc2) contains 128 (=0x80 =b10000000)
+
+Note that bit 3 is set to zero, so the auto-suspend mode is disabled.
+
+Typing
+
+   set6x86 -r 0xC2 -d 0x88
+
+will set bit #3 of that register, thus enabling the auto-suspend mode.  Note
+that the "-d" option assigns a raw data value to the register.
+
+
+Simpler is to use the "-s" or "-c" options. These use the data byte on the
+command line as a set/clear mask instead of raw data to program into the
+register.
+
+So the above can be made much more simple by just typing
+
+   set6x86 -r 0xC2 -s 0x08
+
+This will read register 0xC2, and "set" bits using the mask given (0x08).
+
+The "-s" does a logical "OR" of the original register data and the mask
+data, and programs it back into the register, whilst the "-c" option will do
+a logical "AND" with the inverse of the mask (0xF7 in this case).
+
+
+The included cyrix.cmd file enables a few performance-related thingies on the
+Cyrix 6x86 CPU. Copy it to the /etc/rc.d directory, and call it from e.g.
+rc.local.
+
+It is also instructive on how to use both the tool, and the Cyrix 6x86
+registers. It does a bit of everything.
+
+
+6x86_reg
+--------
+
+This little tool dumps most relevant 6x86 registers in human-readable
+format. It will also correctly identify the 6x86 model and revision, report
+bogoMIPS ratings, and dump the more complex ARRs (Address Region Registers).
+These are the registers where the different memory regions are set up and
+how they are handled (e.g. if they're cached or if any other special
+function is enabled for them).
+
+Running it may reveal something like the output below:
+
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+6x86 (Classic/L/MX) Register Dump utility
+
+6x86 DIR0: 0x52   2.5X core/bus clock ratio
+     DIR1: 0x4 6x86MX Rev. 1.4
+
+Wait a moment...
+Calculated BogoMIPS: 185.12
+Kernel BogoMIPS:  186.78
+
+6x86 CCR0: 0x2 NC1 set (address region 640Kb-1Mb non-cacheable)
+     CCR1: 0x92   NO_LOCK set
+     CCR2: 0x88   SUSP_HLT set (low power suspend mode enabled)
+     CCR3: 0x10
+     CCR4: 0x87   no I/O recovery time
+     CCR5: 0x21   allocate cache lines on write misses
+
+6x86 Address Region Register dump:
+  ARR0: address = 0xA0000 , size = 128 KB
+    RCR = 0x9 : not cached, write gathering
+  ARR1: address = 0xC0000 , size = 256 KB
+    RCR = 0x1 : not cached
+  ARR2: disabled
+  ARR3: address = 0xA8000 , size = 32 KB
+    RCR = 0x9 : not cached, write gathering
+  ARR4: disabled
+  ARR5: disabled
+  ARR6: address = 0xE0000000 , size = 4 MB
+    RCR = 0x9 : not cached, write gathering
+  ARR7: address = 0x0 , size = 32 MB
+    RCR = 0x9 : cached, write gathering
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+This saves you a lot of fingering through the 6x86 data book :-)
+
+
+BogoMIPS
+--------
+
+First of all you must understand that bogoMIPS are _not_ meant as a measure
+of performance, but rather as an indicator that the 6x86 registers and the
+BIOS settings for the chipset on your motherboard are correctly set.
+
+That said, we can look at the three possible outcomes of running 6x86_reg:
+
+1) The calculated bogoMIPS and the kernel bogoMIPS reading from
+/proc/cpuinfo are approx. equal (+/- 1 bogoMIPS). This is the normal case on
+a "quiet" system.
+
+Note that on 6x86 family CPUs, bogoMIPS are approximately equal to the CPU
+core clock rate.
+
+For example:
+   - a 6x86 PR166 should have a bogoMIPS rating of approx. 133, since
+          its core will run at 133MHz (2 x 66.66MHz).
+
+   - a 6x86MX PR233 at 187.5MHz (2.5 x 75MHz) should have a bogoMIPS
+          rating of approx. 187.5.
+
+2) The calculated bogoMIPS is much higher (> 10-15%) than the kernel
+bogoMIPS. This indicates that your BIOS is not setting the 6x86 registers or
+the chipset parameters for the L2 cache correctly, and that set6x86 has
+remedied to this. Adjust your BIOS CMOS settings and/or upgrade the BIOS
+flash EEPROM.
+
+3) The calculated bogoMIPS is lower than the /proc/cpuinfo kernel reading:
+your system load is impairing the bogoMIPS calculation done by 6x86_reg.
+
+
+Fun?
+----
+
+You might even be able to _hear_ the difference!
+
+Most computer power supplies only compensate higher power demands on the +5V
+rail, resulting in an increase on the +12V rail when +5V power demand goes
+up.
+
+The CPU draws from the +5V rail, but the CPU fan uses +12V, so when the CPU
+draws more power (due to CPU load), the CPU cooling fan (which is delivered
+with the CPU by Cyrix) will run a little faster with higher supply voltages,
+so the significant power drop when the CPU drops into power-suspend mode
+might cause a noticeable change in the pitch of the buzzing fan sound!
+
+On my system, I can now HEAR how busy it is...
+
+
+The 6x86 Coma bug
+-----------------
+
+Compile and run the short bug demo program "test_bug.c". Type Control-C to
+try and regain control: nothing happens, right? Your 6x86 CPU is in "coma"
+mode. :-(
+
+The 6x86 CPU effectively gets locked in an infinite loop, executing
+back-to-back locked cycles and consequently unable to service any
+interrupts, including attempts by root to kill the process. This is by all
+means a serious security flaw in a multiuser OS like Linux.
+
+This bug affects all 6x86 family CPUs.
+
+Solution: enable the NO_LOCK bit with set6x86.
+
+
+Support
+-------
+
+None. Your own intelligence and common sense should be enough.
+
+
+DOS and Linux
+-------------
+
+DOS support was removed starting at version 1.4.  DOS, not being a _real_
+Operating System, does busy-waiting when it's idle instead of executing a
+"halt" instruction, and thus the CPU can't know that it should be powering
+down. So it'll still run as hot as under a full load.
+
+Windows 3.1 and '95 don't as well. Blame MicroBrains for that. NT? Don't know.
+
+The Linux version can be downloaded from:
+
+   ftp://tsx-11.mit.edu/pub/linux/sources/sbin
+
+The Linux version works great though.  (It's a real operating system)
+
+
+Author
+-------
+
+Koen Gadeyne, koen.gadeyne@barco.com
+(please contact the maintainer below first)
+
+
+New maintainer for the general/Linux version
+--------------------------------------------
+
+Thanks Koen! I'll do my best with this "hot potato" :-)
+Andrew D. Balsa, andrewbalsa@usa.net
+
+
+OS/2 Modifications/Port:
+-----------------------
+
+Greg Kondrasuk, kondrag@geocities.com
+http://www.geocities.com/SiliconValley/Vista/6434/
+

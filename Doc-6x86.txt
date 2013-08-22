@@ -1,0 +1,170 @@
+                        Cyrix Processor Support
+                        -----------------------
+		By Mike Jagdis, updated by Andrew Balsa.
+
+Processor Recognition
+---------------------
+
+  Cyrix processors prior to the M2 power up in a default mode which is
+designed to avoid compatibility problems with software that makes
+assumptions about processor capabilities based solely on the apparent family
+of processor. Unless special handling is provided Cyrix chips will be
+identified as some unknown model of 486.
+
+  The included Cyrix patch compiles in code that enables the CPUID
+instruction on Cyrix 6x86 processors.
+
+  The M2 and later processors have CPUID enabled by default however special
+handling is still required to read the specific processor type since the
+CPUID information gives family 6, model 0 - i.e. an A step PPro.
+
+  The patch allows all current Cyrix 6x86 family processors to be recognised
+and listed correctly in /proc/cpuinfo. This includes the classic 6x86, the
+6x86L and the 6x86MX.
+
+
+Suspend on Halt Power Saving
+----------------------------
+
+  The suspend on halt power saving feature allows the processor to enter a low
+power mode when the "hlt" instruction is executed. This results in
+dramatically reduced operating temperatures if you do not spend long periods
+of time running processor intensive tasks. Cyrix processors allow this
+feature to be enabled and disabled through their configuration registers.
+The default state on reset is disabled and most BIOSes leave it disabled.
+
+  However there appear to be a few rare cases in which the combination of
+suspend on halt and some bus master DMA Ethernet cards can cause the system
+to lock up. In these cases setting SUSP_HALT with a specific set6x86 line in
+your rc.cyrix file should be avoided.
+
+
+6x86 Performance Features
+-------------------------
+
+  The 6x86 has several Cyrix specific performance features. Normally a 6x86
+aware BIOS will set these to reasonable, if not fully optimal, settings.
+
+  Benchmarking has shown that this fine-tuning is not needed for normal Linux
+operation, bringing little or no performance improvements.
+
+
+6x86 Branch Prediction
+----------------------
+
+  The 6x86 uses speculative execution coupled with several levels of branch
+prediction to maximise processing speed. While the default power up state is
+reasonable the branch prediction logic is configurable and there may be some
+benefit in fine tuning it. However benchmarking has shown that even through
+extensive tweaking performance gains are marginal (< 0.5 %).
+
+  Unfortunately Cyrix offers no documentation on how to configure branch
+prediction and IBM has only partial documentation available. Further detail
+and speculation is available from the 6x86opt package by Mikael Johansson
+<Mikael.Johansson@helsinki.fi>.
+
+  The initial power up state of the 6x86 configures the branch prediction
+logic to handle short branches.
+
+
+6x86 Variable Sized Paging Mechanism
+------------------------------------
+
+  The variable sized paging mechanism (VSPM) is a feature of the Cyrix 6x86
+(Classic and L) processors that allows large regions of memory to be mapped
+using a single MMU entry rather than many individual page sized entries.
+This significantly reduces the overhead in accessing such regions. It is
+also ideally suited to use for the linear mapping of physical memory to
+kernel memory used by the Linux kernel, which has a fixed mapping in memory
+after boot time.
+  
+  Again, extensive benchmarking has shown that turning on this feature
+brings no measurable performance improvement in normal use, since the
+6x86(L) also has sophisticated caching for the standard fixed-size 4Kb
+paging mechanism.
+
+  Perhaps for this reason and also because OS designers didn't seem
+interested by this specific feature, Cyrix has dropped VSPM on its new
+6x86MX processors.
+
+  The IBM/Cyrix 6x86 and 6x86L Data Books offer only a brief paragraph of
+explanation about VSPM. Unfortunately the observed behaviour of VSPM
+suggests that even this little information is not entirely correct. Worse
+still, no one at Cyrix is able to answer questions concerning VSPM. Given
+that every revision of 6x86 has *different* VSPM bugs this is not entirely
+surprising!
+
+  Since VSPM is not available on 6x86MX processors and Cyrix has dropped all
+support for this feature, VSPM can be considered as a nice experimental
+feature, but not as an option for "production" kernels.
+
+  WARNING: There appears to be no way to disable a VSPM entry once it has
+been created short of a hard reset (which may mean a power cycle). Failure
+to clear the VSPM entries means that programs that use virtual memory
+layouts different from Linux will crash unexpectedly after Linux has been
+running. This includes Windows NT/95, programs that use DOS extenders etc.
+
+  By experiment:
+
+  * VSPM pages must be power of two sizes. A single 24MB page fails.
+    This is not entirely surprising but the documentation could give
+    the impression that VSPM supports arbitrary sizes.
+
+  * Documentation suggests there are 8 VSPM slots (3 bit index) but
+    tests show the upper four slots mirror the lower four.
+
+  * VSPM entries appear to override traditional page table entries
+    so we must not overlap the start of the vmalloc region.
+
+  The following only apply to 6x86 1 rev 6 or lower, 1 rev 7 and up seem not
+to have these restrictions.
+
+  * With a 16MB page followed by an 8MB page I always get a write
+    fault on the last 4k of the 8MB page. With 8MB plus 4MB I can't
+    even boot.
+      If we have such a memory size we map the first power of two
+    with a VSPM entry and use traditional paging for the rest.
+
+  * Do not try and create a mapping with dirty and accessed flags
+    clear - a step 1 rev 5 chip will crash.
+
+  * The valid bit in a VSPM entry is non-functional. There is no way
+    to invalidate a VSPM entry once it has been written 
+
+  * Attempting to replace a VSPM entry with one that maps a zero
+    sized region from 0 to 0 crashes the CPU.
+
+
+What more could be done
+-----------------------
+
+  The 6x86 allows Address Regions to be set up and en/disabling certain
+features for these regions. We could analyse the setup done (or not done) by
+the BIOS and optimize it.
+
+  * Setting up regions fo the main memory: RCE, WWO, WL(?), WG
+
+  * Setting up VGA text (0x000a0000) and graphics memory (PCI:
+    e.g. 0xe0000000) to RCD, WG
+
+  * Setting up BIOS regions to RCD or RCE, WT
+
+  * Not touching SMM space (ARR3)
+
+  * Disabling WG for Memory Mapped IO
+
+  (RCE/D = Region cache enable/disable, WWO = Weak Write Ordering, WL = Weak
+Locking, WG = Write Gathering, WT = Write Through.)
+
+
+Where to get information
+------------------------
+
+  There is a databook in PDF format (6X-DBOOK.PDF), which can be down-
+loaded from Cyrix' WWW server, which contains a description of the
+Configuration Registers CCR0 - CCR5, the Device Identification Registers
+DIR0 DIR1 and the Address Region ARRx and Region Control RCRx registers and
+an incomplete description of the VSPM mechanism. More about CPU detection,
+VSPM and more undocumented features can be found on the Linux 6x86
+mini-HOWTO site (http://www.tux.org/~balsa/linux/cyrix) and by following the
+links found in the docs.

@@ -1,0 +1,31 @@
+
+6x86 (Classic/L/MX) Register Dump utility
+
+6x86 DIR0: 0x52	2.5X core/bus clock ratio
+     DIR1: 0x4	6x86MX Rev. 1.4
+
+Wait a moment...
+Calculated BogoMIPS:	185.12
+Kernel BogoMIPS:	186.78
+
+6x86 CCR0: 0x2	NC1 set (address region 640Kb-1Mb non-cacheable)
+     CCR1: 0x92	NO_LOCK set
+     CCR2: 0x88	SUSP_HLT set (low power suspend mode enabled)
+     CCR3: 0x10
+     CCR4: 0x87	no I/O recovery time
+     CCR5: 0x21	allocate cache lines on write misses
+
+6x86 Address Region Register dump:
+  ARR0: address = 0xA0000 , size = 128 KB
+    RCR = 0x9 : not cached, write gathering
+  ARR1: address = 0xC0000 , size = 256 KB
+    RCR = 0x1 : not cached
+  ARR2: disabled
+  ARR3: address = 0xA8000 , size = 32 KB
+    RCR = 0x9 : not cached, write gathering
+  ARR4: disabled
+  ARR5: disabled
+  ARR6: address = 0xE0000000 , size = 4 MB
+    RCR = 0x9 : not cached, write gathering
+  ARR7: address = 0x0 , size = 32 MB
+    RCR = 0x9 : cached, write gathering

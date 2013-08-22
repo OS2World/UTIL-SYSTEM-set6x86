@@ -1,0 +1,59 @@
+                set6x86 / get6x86 and 6x86_reg
+=====================================================================
+Copywrite (C) 1996, 1997 Koen Gadeyne (koen.gadeyne@barco.com)
+OS/2 port by Greg Kondrasuk (kondrag@geocities.com), January 1998.
+
+*********************************************************************
+
+   THIS SOFTWARE CHANGES THE INTERNAL REGISTERS OF YOUR CYRIX CPU.
+
+                    USE AT YOUR OWN RISK!
+
+*********************************************************************
+
+This is a port of the set6x86 1.5 program for Linux and DOS done by
+Koen Gadeyne.  I've changed some of the option flags to get around the
+differences between the Linux/gcc and OS/2/gcc/emx implementations of
+the getopt function.
+
+The program was compiled with emx 0.9c with fix 4 applied.  You'll need
+to have the emx runtime libraries installed in order to run it.  The
+newest versions can always be found at hobbes.nmsu.edu as emxrt.zip in
+the newest subdirectory of /pub/os2/dev/emx.
+
+NOTE:  Only set6x86.exe is included here.  Just make another copy of it
+====   as get6x86.exe to use the register lookup functions of get6x86.
+       The program looks at its own name to determine if it is in "set"
+       or "get" mode.
+
+This program will allow you to set some of the special registers in the
+Cyrix 6x86 and 6x86MX (and possibly 5x86).  Most important is the power-
+saving feature that will power down the CPU from its whopping 24W normal
+state (for the the non-L series orginal 6x86) to a 0.3W state when OS/2
+issues a halt instruction.  You'll be able to hear the CPU power-down
+when idle--there is much less strain on the power supply.
+
+There is no performance penalty associated with the power-down feature.
+
+The included 6x86.cmd (for the 6x86 and 6x86L) and 6x86MX.cmd (for the 6x86MX)
+files have commands to set some of the special registers.  The only ones 
+I think you need to be careful of are the linear memory addressing for the 
+VGA buffer.  This caused a lot of video problems with my old S3 765 Trio64V+ 
+card, but seems to work just fine with my Matrox Millennium.  It does give a 
+nice boost to DIVE performance, but use with caution.  Enabling the other 
+registers gives a slight boost (just a few percentage points) to most CPU 
+benchmarks and memory transfersaccording to SysBench 0.92.  These are 
+commented out in the .cmd files, so uncomment them if you want to give them
+a try.
+
+New in this version of the .cmd files is the NO_LOCK register setting, which 
+is a fix for the "coma" bug in the 6x86 and 6x86MX.  See the README file for 
+more info.
+
+6x86_reg.exe was introduced in release 1.4.  It does a register dump to
+the screen of the current state of the CPU in human-readable format and
+will also correctly identify the 6x86 model and revision, report
+bogoMIPS ratings, and dump the more complex ARRs (Address Region Registers).
+These are the registers where the different memory regions are set up and
+how they are handled (e.g. if they're cached or if any other special
+function is enabled for them).

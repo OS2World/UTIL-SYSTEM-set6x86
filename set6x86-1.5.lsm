@@ -1,0 +1,23 @@
+Begin3
+Title: Cyrix/IBM 6x86 CPU configuration tool
+Version: 1.5
+Entered-date: 14DEC97
+Description: Allows one to modify the internal configuration registers in
+             the 6x86 (Classic, L, MX) CPUs. These include special
+             memory areas (important for e.g. graphics cards), I/O delays,
+             cache write policy (WB/WT), write-gathering, and an
+             automatic power-down mode when a HALT instruction is executed.
+             A utility to display 6x86 registers and model/revision is
+             included, as well as a short kernel patch that correctly
+             identifies Cyrix 6x86 CPUs in /proc/cpuinfo.
+Keywords: Cyrix IBM SGS-Thomson 6x86 CPU cooling performance
+Author: koen.gadeyne@barco.com (Koen Gadeyne)
+Maintained-by: andrewbalsa@usa.net (Andrew Balsa)
+Primary-site: sunsite.unc.edu /pub/Linux/system/Misc
+              27Kb set6x86-1.5.tar.gz
+              1Kb set6x86-1.5.lsm
+Alternate-site: 
+Original-site: www.tux.org/~balsa/linux/cyrix
+Platforms: Linux 2.x with 6x86 CPUs.
+Copying-policy: GPL
+End
